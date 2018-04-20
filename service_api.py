@@ -31,23 +31,26 @@ class jwt_message(flask_restful.Resource):
         }
     def post(self,todo_id):
         login_url = "http://app.shujushijue.cn/nauth/logincheck"
-        todos = request.form["username"]
-        # login_data = json.dumps({"orgName":"app","username":todos['username'],"password":todos['pwd'],"remember":0,"hash":"","scene":"","token":"","spectacle":""})
-        # login_req = urllib2.Request(url=login_url,headers=self.send_header,data=login_data)
-        # login_req.get_method = lambda :"POST"
-        # urllib2.urlopen(login_req)
-        # feapp_url = 'http://app.shujushijue.cn/home/feapp'
-        # feapp_req = urllib2.Request(url=feapp_url)
-        # feapp_req.get_method = lambda: "GET"
-        # feapp_res = urllib2.urlopen(feapp_req)
-        # jwt_str = BeautifulSoup(feapp_res, "lxml").find(class_="get-full-body").find_all("script")[1].text
-        # jwt = jwt_str.split('"')[1]
-        # return {"JWT %s" % jwt}
-        return todos
+        todos = request.get_json('key') #获取请求post的json内容
+        #request.form.get("key", type=str, default=None) 获取表单数据
+        #request.args.get("key") 获取get请求参数
+        #request.values.get("key") 获取所有参数
+        login_data = json.dumps({"orgName":"app","username":todos['username'],"password":todos['pwd'],"remember":0,"hash":"","scene":"","token":"","spectacle":""})
+        login_req = urllib2.Request(url=login_url,headers=self.send_header,data=login_data)
+        login_req.get_method = lambda :"POST"
+        urllib2.urlopen(login_req)
+        feapp_url = 'http://app.shujushijue.cn/home/feapp'
+        feapp_req = urllib2.Request(url=feapp_url)
+        feapp_req.get_method = lambda: "GET"
+        feapp_res = urllib2.urlopen(feapp_req)
+        jwt_str = BeautifulSoup(feapp_res, "lxml").find(class_="get-full-body").find_all("script")[1].text
+        jwt = jwt_str.split('"')[1]
+        return "JWT %s" % jwt
+        # return json.dumps(todos)
 
 
 
 # api.add_resource(HelloWorld, '/')
 api.add_resource(jwt_message,'/<string:todo_id>')
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0') #本地访问地址为：http://0.0.0.0:5000
