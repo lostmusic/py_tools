@@ -30,7 +30,7 @@ class jwt_message(flask_restful.Resource):
             'X-Requested-With': 'XMLHttpRequest',
         }
     def post(self,todo_id):
-        login_url = "http://app.shujushijue.cn/nauth/logincheck"
+        login_url = "http://XXX.XXX.XXX/nauth/logincheck"
         todos = request.get_json('key') #获取请求post的json内容
         #request.form.get("key", type=str, default=None) 获取表单数据
         #request.args.get("key") 获取get请求参数
@@ -39,7 +39,7 @@ class jwt_message(flask_restful.Resource):
         login_req = urllib2.Request(url=login_url,headers=self.send_header,data=login_data)
         login_req.get_method = lambda :"POST"
         urllib2.urlopen(login_req)
-        feapp_url = 'http://app.shujushijue.cn/home/feapp'
+        feapp_url = 'http://xxx.xxx.xxx/home/feapp'
         feapp_req = urllib2.Request(url=feapp_url)
         feapp_req.get_method = lambda: "GET"
         feapp_res = urllib2.urlopen(feapp_req)
