@@ -9,9 +9,10 @@ app = Flask(__name__)
 def hello_world():
 
     return 'Hello World!'
-@app.route('/projects/')
+
+@app.route('/projects/') #获取get传入参数http://127.0.0.1:5000/projects/?abc=hello
 def projects():
-    return "the project page"
+    return json.dumps({"param":request.args.get("abc")})
 
 @app.route('/username/<usernam>') #设置传入变量，可通过url请求来发送
 def username(usernam):
