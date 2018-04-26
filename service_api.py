@@ -5,7 +5,7 @@ from flask import Flask,request
 from bs4 import BeautifulSoup
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/') #设置路由，可通过http://0.0.0.0:5000/来访问
 def hello_world():
 
     return 'Hello World!'
@@ -13,11 +13,15 @@ def hello_world():
 def projects():
     return "the project page"
 
+@app.route('/username/<usernam>') #设置传入变量，可通过url请求来发送
+def username(usernam):
+    return "the username is:%s" % usernam
+
 @app.route('/about')
 def haha():
     return "the about page"
 
-@app.route('/login',methods=['GET','POST'])
+@app.route('/login',methods=['GET','POST']) #设置请求方式，get、post、put、delete等
 def login():
     cookiejr = cookielib.CookieJar()
     cookie_handler = urllib2.HTTPCookieProcessor(cookiejr)
