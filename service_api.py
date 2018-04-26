@@ -1,56 +1,60 @@
 #!/usr/bin/python
 # coding:utf-8
-import cookielib,json
-import urllib2
-from bs4 import BeautifulSoup
+import urllib2,cookielib,json
 from flask import Flask,request
-import flask_restful
-
+from bs4 import BeautifulSoup
 app = Flask(__name__)
-api = flask_restful.Api(app)
 
-# class HelloWorld(flask_restful.Resource):
-#     def get(self):
-#         return {'hello': 'world'}
+@app.route('/')
+def hello_world():
 
-class jwt_message(flask_restful.Resource):
-    def __init__(self):
-        super(jwt_message, self).__init__()
-        cookiejr = cookielib.CookieJar()
-        cookie_handler = urllib2.HTTPCookieProcessor(cookiejr)
-        cookie_oppener = urllib2.build_opener(cookie_handler)
-        urllib2.install_opener(cookie_oppener)
-        self.send_header = {
-            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/63.0.3239.84 Chrome/63.0.3239.84 Safari/537.36',
-            "Accept-Language": "zh-CN,zh;q=0.9",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Content-Type': 'application/json;charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-        }
-    def post(self,todo_id):
-        login_url = "http://XXX.XXX.XXX/nauth/logincheck"
-        todos = request.get_json('key') #获取请求post的json内容
-        #request.form.get("key", type=str, default=None) 获取表单数据
-        #request.args.get("key") 获取get请求参数
-        #request.values.get("key") 获取所有参数
-        login_data = json.dumps({"orgName":"app","username":todos['username'],"password":todos['pwd'],"remember":0,"hash":"","scene":"","token":"","spectacle":""})
-        login_req = urllib2.Request(url=login_url,headers=self.send_header,data=login_data)
-        login_req.get_method = lambda :"POST"
-        urllib2.urlopen(login_req)
+    return 'Hello World!'
+@app.route('/projects/')
+def projects():
+    return "the project page"
+
+@app.route('/about')
+def haha():
+    return "the about page"
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+    cookiejr = cookielib.CookieJar()
+    cookie_handler = urllib2.HTTPCookieProcessor(cookiejr)
+    cookie_oppener = urllib2.build_opener(cookie_handler)
+    urllib2.install_opener(cookie_oppener)
+    send_header = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/63.0.3239.84 Chrome/63.0.3239.84 Safari/537.36',
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'X-Requested-With': 'XMLHttpRequest',
+    }
+    login_url = "http://xxx.xxx.xxx/nauth/logincheck"
+    
+    #request.form.get("key", type=str, default=None) 获取表单数据
+    #request.args.get("key") 获取get请求参数
+    #request.values.get("key") 获取所有参数
+    get_data = request.get_json() #获取请求post的json内容
+    login_data = json.dumps(
+        {"orgName": "app", "username": get_data["username"], "password": get_data["pwd"], "remember": 0, "hash": "",
+         "scene": "", "token": "", "spectacle": ""})
+    login_req = urllib2.Request(url=login_url,data=login_data,headers=send_header)
+    login_req.get_method = lambda :"POST"
+    login_res = urllib2.urlopen(login_req)
+    if request.method == 'POST':
         feapp_url = 'http://xxx.xxx.xxx/home/feapp'
         feapp_req = urllib2.Request(url=feapp_url)
         feapp_req.get_method = lambda: "GET"
         feapp_res = urllib2.urlopen(feapp_req)
         jwt_str = BeautifulSoup(feapp_res, "lxml").find(class_="get-full-body").find_all("script")[1].text
         jwt = jwt_str.split('"')[1]
+
         return "JWT %s" % jwt
-        # return json.dumps(todos)
+    elif request.method == 'GET':
+        return "login sucessful"
 
-
-
-# api.add_resource(HelloWorld, '/')
-api.add_resource(jwt_message,'/<string:todo_id>')
 if __name__ == '__main__':
-    app.run(host='0.0.0.0') #本地访问地址为：http://0.0.0.0:5000
+    app.run(host='0.0.0.0')
